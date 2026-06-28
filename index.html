@@ -114,7 +114,7 @@
                     <span>VocaDiary</span>
                     <span class="text-[10px] bg-indigo-900/50 text-indigo-300 px-1.5 py-0.5 rounded-full font-bold">PRO</span>
                 </h1>
-                <p class="text-[10px] sm:text-xs text-diary-darkSoftText">스마트 영단어장</p>
+                <p class="text-[10px] sm:text-xs text-diary-darkSoftText">야간 전용 스마트 감각 다이어리 영단어장</p>
             </div>
         </div>
 
@@ -760,7 +760,7 @@
         // Global API Key
         const apiKey = "";
 
-        // Default Mock Data (첫 번째 일지에는 7개 이상 포함하여 퀴즈 제한 해제 확인)
+        // Default Mock Data
         const defaultDiaryEntries = [
             {
                 id: 'diary-1',
@@ -1356,9 +1356,15 @@
             return errorMsg;
         }
 
-        // [MODIFIED] 우회 로직을 삭제하고 Gemini-3.5-flash 모델 단일로만 직접 호출합니다.
+        // [MODIFIED] PC와 모바일 간 로컬 스토리지 불일치 문제를 해결하기 위한 명시적 예외 처리
         async function executeGeminiRequest(payload) {
             const activeKey = getActiveApiKey();
+            
+            // API 키가 비어있을 경우 (특히 새 기기나 폰에서 접속했을 때) 사용자에게 명확히 안내합니다.
+            if (!activeKey || activeKey.trim() === "") {
+                throw new Error("설정(⚙️) 메뉴에서 Gemini API Key를 저장해 주세요. (폰에서 처음 접속시 재입력 필요)");
+            }
+
             const model = 'gemini-3.5-flash';
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${activeKey}`;
             
